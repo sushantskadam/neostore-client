@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Row, Col, Form } from "react-bootstrap";
 import { getUser, addAddress } from "../../config/Myservice";
-
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "./EditProfile.css";
 
 const regForName = /^[a-zA-Z ]{2,100}$/;
 
 function AddAddress() {
-
   const [useremail, setUseremail] = useState("");
   const refaddress = useRef(null);
   const refpincode = useRef(null);
@@ -20,6 +20,13 @@ function AddAddress() {
     city: "",
     state: "",
     country: "",
+  });
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -51,14 +58,20 @@ function AddAddress() {
 
       addAddress(data, useremail).then((res) => {
         if (res.data.err === 0) {
-          alert("Address Added Successfully");
+          // alert("Address Added Successfully");
+          setAlertmsg("Address Added Successfully");
+          setOpen(true);
           document.getElementById("addform").reset();
         } else {
-          alert("Something Went Wrong");
+          // alert("Something Went Wrong");
+          setAlertmsg("Something Went Wrong");
+          setOpen2(true);
         }
       });
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen2(true);
     }
   };
   const handler = (event) => {
@@ -98,8 +111,49 @@ function AddAddress() {
     Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
     return valid;
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false);
+    setOpen(false);
+  };
   return (
     <div className="card  text-start  editprofile">
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          sx={{ width: "100%", height: "100%" }}
+        >
+          {alertmsg}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={open2}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="error"
+          sx={{ width: "100%", height: "100%" }}
+        >
+          {alertmsg}
+        </Alert>
+      </Snackbar>
       <div className="card-header">
         <h2 className="fontapply">Add New Address</h2>
       </div>
@@ -124,7 +178,7 @@ function AddAddress() {
               )}
             </Col>
           </Form.Group>
-          <Form.Group as={Row} className="mb-4" >
+          <Form.Group as={Row} className="mb-4">
             <Col sm={6}>
               {/* <Form.Label for="inputAddress">Address</Form.Label> */}
               <Form.Control
@@ -141,7 +195,7 @@ function AddAddress() {
               )}
             </Col>
           </Form.Group>
-          <Form.Group as={Row} className="mb-4" >
+          <Form.Group as={Row} className="mb-4">
             <Col sm={5}>
               {/* <Form.Label for="inputAddress">Address</Form.Label> */}
               <Form.Control
@@ -197,11 +251,9 @@ function AddAddress() {
         <Button onClick={() => addAddHandler()} variant="outline-dark">
           <i className="fa fa-save"></i> Save
         </Button>
-        
       </div>
     </div>
   );
- 
 }
 
 export default AddAddress;

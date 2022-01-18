@@ -11,6 +11,8 @@ import {
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import "./ForgotPassword.css";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 // import bcryptjs from 'bcryptjs';
 const regForEmail = RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 
@@ -36,7 +38,13 @@ function ForgotPassword() {
   const [userdata, setuserdata] = useState();
   const [genOTP, setgenOTP] = useState();
   const [otpsent, setotpsent] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
 
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   useEffect(() => {
     const userdata = JSON.parse(localStorage.getItem("user"));
     setuserdata(userdata);
@@ -105,15 +113,21 @@ function ForgotPassword() {
         let password = user.password;
         updatePassword({ email, password }).then((res, err) => {
           console.log(err);
-          alert("Password Successfully Updated");
+          // alert("Password Successfully Updated");
+          setAlertmsg("Password Successfully Updated");
+          setOpen(true);
 
           localStorage.removeItem("login");
           localStorage.removeItem("user");
           localStorage.removeItem("_token");
-          navigate("/login");
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
         });
       } else {
-        alert("Wrong Otp");
+        // alert("Wrong Otp");
+        setAlertmsg("Wrong OTP");
+        setOpen2(true);
       }
       // addSignup(user).then((res) => {
       //   if (res.data.err === 0) {
@@ -127,7 +141,9 @@ function ForgotPassword() {
 
       document.getElementById("myForm").reset();
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen2(true);
     }
   };
   const validate = (errors) => {
@@ -145,9 +161,62 @@ function ForgotPassword() {
     });
     setotpsent(true);
   };
+  const sendotpagain = () => {
+    // const otp = generateOTP();
+    // setgenOTP(otp);
+    let remail = user.email;
+    sendMailotp({ remail }).then((res, err) => {
+      // console.log(res.data)
+      setgenOTP(res.data);
+    });
+    setAlertmsg("OTP Sent Again")
+    setOpen(true)
+    setotpsent(true);
+  };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false);
+    setOpen(false);
+  };
 
   return (
     <div>
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          sx={{ width: "100%", height: "100%" }}
+        >
+          {alertmsg}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={open2}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="error"
+          sx={{ width: "100%", height: "100%" }}
+        >
+          {alertmsg}
+        </Alert>
+      </Snackbar>
       <Container className=" mt-3 ">
         <div className="formadjustforgot">
           <Form id="myForm  ">
@@ -190,15 +259,18 @@ function ForgotPassword() {
                   </Row>
                 </Form.Group>
               ) : (
+                <>
                 <Row>
-                  <Col xs lg="12">
+                  <Col sm={12} className="justify-content-center">
                     <div className="alert alert-info" role="alert">
                       OTP has been sent to your Registered Email ID
                     </div>
                   </Col>
-                  <Col xs lg="12">
+                  </Row>
+                  <Row>
+                  <Col sm={12}>
                     <Button
-                      onClick={sendotp}
+                      onClick={sendotpagain}
                       variant="success"
                       className=""
                       size="xs"
@@ -207,6 +279,7 @@ function ForgotPassword() {
                     </Button>
                   </Col>
                 </Row>
+                </>
               )}
 
               <br />

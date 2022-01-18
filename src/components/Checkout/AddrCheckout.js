@@ -3,6 +3,8 @@ import { Button, Row, Col } from "react-bootstrap";
 import { getCustAddress, deleteAddr } from "../../config/Myservice";
 import AddAddrCheckout from "./AddAddrCheckout";
 import EaddrCheckout from "./EaddrCheckout";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "./Checkout.css";
 function AddrCheckout() {
   const [alladdr, setAlladdr] = useState([]);
@@ -11,6 +13,12 @@ function AddrCheckout() {
   const [index, setIndex] = useState();
   const [addaddr, setAddaddr] = useState(false);
   const [selectedadd, setselectedadd] = useState();
+  const [open, setOpen] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   useEffect(() => {
     setShowedit(false);
 
@@ -34,7 +42,9 @@ function AddrCheckout() {
             setAlladdr(res.data.data);
           }
         });
-        alert("Address Successfully Deleted");
+        // alert("Address Successfully Deleted");
+        setAlertmsg("Address Successfully Deleted")
+        setOpen(true)
       }
     });
   };
@@ -49,12 +59,35 @@ function AddrCheckout() {
     localStorage.setItem("selectedaddr", JSON.stringify(addr));
     setselectedadd(addr);
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
   if (alladdr.length === 0 || addaddr) {
     return <AddAddrCheckout />;
   } 
    else if (!showedit) {
     return (
       <div className="card  text-start  editprofile">
+         <Snackbar
+          open={open}
+          autoHideDuration={2000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
         <div className="card-header">
           {selectedadd ? (
             <h2 className="fontapply">Address</h2>

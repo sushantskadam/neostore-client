@@ -2,12 +2,19 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button, Row, Col, Container, Form } from "react-bootstrap";
 import { getCustAddress, deleteAddr } from "../../config/Myservice";
 import EditAddress from "./EditAddress";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 function Address({ setShowadd, showadd }) {
   const [alladdr, setAlladdr] = useState([]);
   const [showedit, setShowedit] = useState(false);
   const [addr, setAddr] = useState("");
   const [index, setIndex] = useState();
+  const [open, setOpen] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
 
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   useEffect(() => {
     setShowedit(false);
 
@@ -30,19 +37,44 @@ function Address({ setShowadd, showadd }) {
             setAlladdr(res.data.data);
           }
         });
-        alert("Address Successfully Deleted");
+        // alert("Address Successfully Deleted");
+        setAlertmsg("Address Successfully Deleted");
+        setOpen(true);
       }
     });
   };
   const editHandler = (addr, i) => {
-    console.log(addr)
+    console.log(addr);
     setShowedit(true);
     setAddr(addr);
     setIndex(i);
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen(false);
+  };
   if (!showedit) {
     return (
       <div className="card  text-start  editprofile">
+        <Snackbar
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
         <div className="card-header">
           <h2 className="fontapply">Addresses</h2>
         </div>

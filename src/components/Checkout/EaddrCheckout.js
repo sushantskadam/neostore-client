@@ -1,14 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Row, Col, Container, Form } from "react-bootstrap";
-import { updateAddr,getCustAddress } from "../../config/Myservice";
+import { updateAddr, getCustAddress } from "../../config/Myservice";
 import { useNavigate } from "react-router-dom";
 // import "./EditProfile.css";
 import AddrCheckout from "./AddrCheckout";
-
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 const regForName = /^[a-zA-Z ]{2,100}$/;
 
 // import Address from "./Address";
-function EaddrCheckout({ setShowedit, showedit, addr, index,setAlladdr }) {
+function EaddrCheckout({ setShowedit, showedit, addr, index, setAlladdr }) {
   const navigate = useNavigate();
 
   const [edit, setedit] = useState(true);
@@ -26,6 +27,13 @@ function EaddrCheckout({ setShowedit, showedit, addr, index,setAlladdr }) {
     city: "",
     state: "",
     country: "",
+  });
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -64,20 +72,28 @@ function EaddrCheckout({ setShowedit, showedit, addr, index,setAlladdr }) {
       const email = user.email;
       updateAddr(data, email).then((res) => {
         if (res.data.err === 0) {
-          alert("Address Updated Successfully");
+          // alert("Address Updated Successfully");
+          setAlertmsg("Address Updated Successfully");
+          setOpen(true);
           getCustAddress(email).then((res) => {
             if (res.data.err == 0) {
               setAlladdr(res.data.data);
             }
           });
-          setShowedit(false);
+          setTimeout(() => {
+            setShowedit(false);
+          }, 1000);
           document.getElementById("editform").reset();
         } else {
-          alert("Something Went Wrong");
+          // alert("Something Went Wrong");
+          setAlertmsg("Something Went Wrong");
+          setOpen2(true);
         }
       });
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen2(true);
     }
   };
   const handler = (event) => {
@@ -117,9 +133,50 @@ function EaddrCheckout({ setShowedit, showedit, addr, index,setAlladdr }) {
     Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
     return valid;
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false);
+    setOpen(false);
+  };
   if (showedit) {
     return (
       <div className="card  text-start  editprofile">
+        <Snackbar
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={open2}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="error"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
         <div className="card-header">
           <h2 className="fontapply">Update Address</h2>
         </div>

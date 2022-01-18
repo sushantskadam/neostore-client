@@ -23,6 +23,8 @@ import {
   TelegramShareButton,
   TelegramIcon,
 } from "react-share";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "./ProdDetails.css";
 function ProdDetails() {
   let { id } = useParams();
@@ -36,6 +38,10 @@ function ProdDetails() {
   const [alertmsg, setAlertmsg] = useState(false);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const override = `
   display: block;
   margin: 230px auto;
@@ -43,7 +49,7 @@ function ProdDetails() {
 `;
 
   useEffect(() => {
-    countcalc()
+    countcalc();
     const user = JSON.parse(localStorage.getItem("user"));
     setUserdata(user);
 
@@ -107,6 +113,7 @@ function ProdDetails() {
       if (found === true) {
         // alert("Product Quantity Increased");
         setAlertmsg("Product Quantity Increased");
+        setOpen(true)
         const index = array.findIndex((x) => x.id === prod._id);
         let newarray = array;
         let updata = {
@@ -130,7 +137,9 @@ function ProdDetails() {
         localStorage.setItem("cart", JSON.stringify(array));
 
         // alert("Product Added To Cart");
+        // setAlertmsg("Product Added To Cart");
         setAlertmsg("Product Added To Cart");
+        setOpen(true);
       }
     } else {
       let array = [];
@@ -143,8 +152,16 @@ function ProdDetails() {
       setAlertmsg("Product Added To Cart");
     }
 
-    countcalc()
+    countcalc();
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    
+    setOpen(false);
+  };
+
 
   if (product) {
     return (
@@ -159,10 +176,26 @@ function ProdDetails() {
         ) : (
           <>
             <Container>
-              {alertmsg && (
+              {/* {alertmsg && (
                 <Alert variant="info mt-2 fontapply fs-5">{alertmsg}</Alert>
-              )}
-
+              )} */}
+              <Snackbar
+                open={open}
+                autoHideDuration={1000}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "center",
+                }}
+              >
+                <Alert
+                  onClose={handleClose}
+                  severity="success"
+                  sx={{ width: "100%", height: "100%" }}
+                >
+                  {alertmsg}
+                </Alert>
+              </Snackbar>
               <Row className="containerdetails fontapplydetails text-start mt-3">
                 <Col className="left-column" lg={5}>
                   <div>

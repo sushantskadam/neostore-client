@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Row, Col, Form } from "react-bootstrap";
 import { getUser, addAddress } from "../../config/Myservice";
-
 import AddrCheckout from "./AddrCheckout";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 const regForName = /^[a-zA-Z ]{2,100}$/;
 
 function AddAddrCheckout() {
-
   const [userdb, setUserdb] = useState("");
   const [useremail, setUseremail] = useState("");
   const [showadd, setShowadd] = useState(false);
@@ -22,6 +22,13 @@ function AddAddrCheckout() {
     state: "",
     country: "",
   });
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     const email = user.email;
@@ -29,7 +36,6 @@ function AddAddrCheckout() {
     getUser(email).then((res) => {
       if (res.data.err === 0) {
         setUserdb(res.data.data);
-        
       }
     });
   }, []);
@@ -50,20 +56,27 @@ function AddAddrCheckout() {
         state: refstate.current.value,
         country: refcountry.current.value,
       };
-      
 
       addAddress(data, useremail).then((res) => {
         if (res.data.err === 0) {
-          alert("Address Added Successfully");
+          // alert("Address Added Successfully");
+          setAlertmsg("Address Added Successfully");
+          setTimeout(() => {
+            setOpen(true);
+          }, 1500);
           // setedit(true);
           setShowadd(true);
           document.getElementById("addform").reset();
         } else {
-          alert("Something Went Wrong");
+          // alert("Something Went Wrong");
+          setAlertmsg("Something Went Wrong");
+          setOpen2(true);
         }
       });
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen2(true);
     }
   };
   const handler = (event) => {
@@ -74,7 +87,7 @@ function AddAddrCheckout() {
       case "address":
         let eaddress = value.length > 10 ? "" : "Min 10 Characters";
         setErrors({ ...errors, address: eaddress });
-        
+
         break;
       case "pincode":
         let epincode = value.length > 4 ? "" : "Please Enter Valid Pincode";
@@ -103,18 +116,56 @@ function AddAddrCheckout() {
     Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
     return valid;
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false);
+    setOpen(false);
+  };
   if (!showadd) {
     return (
       <div className="card  text-start  editprofile">
+        <Snackbar
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={open2}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="error"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
         <div className="card-header">
           <h2 className="fontapply">Add New Address</h2>
         </div>
         <div className="card-body mt-2">
           <Form id="addform">
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={7}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control
@@ -135,10 +186,7 @@ function AddAddrCheckout() {
                 )}
               </Col>
             </Form.Group>
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={6}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control
@@ -157,10 +205,7 @@ function AddAddrCheckout() {
                 )}
               </Col>
             </Form.Group>
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={5}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control
@@ -193,10 +238,7 @@ function AddAddrCheckout() {
                 )}
               </Col>
             </Form.Group>
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={6}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control

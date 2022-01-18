@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Container, Button, Row, Col } from "react-bootstrap";
-import {
-  delCart,
-  checkoutOrder,
-} from "../../config/Myservice";
+import { delCart, checkoutOrder } from "../../config/Myservice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import AddrCheckout from "./AddrCheckout";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+import GooglePayButton from "@google-pay/button-react";
+
 import "./Checkout.css";
 function Checkout() {
   const [cartitems, setCartitems] = useState([]);
@@ -17,7 +18,49 @@ function Checkout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [selectedaddr, setselectedaddr] = useState();
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
 
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
+  const [buttonColor, setButtonColor] = useState("default");
+  const [buttonType, setButtonType] = useState("buy");
+  const [buttonSizeMode, setButtonSizeMode] = useState("static");
+  const [buttonWidth, setButtonWidth] = useState(320);
+  const [buttonHeight, setButtonHeight] = useState(50);
+  const paymentRequest = {
+    apiVersion: 2,
+    apiVersionMinor: 0,
+    allowedPaymentMethods: [
+      {
+        type: "CARD",
+        parameters: {
+          allowedAuthMethods: ["PAN_ONLY", "CRYPTOGRAM_3DS"],
+          allowedCardNetworks: ["MASTERCARD", "VISA"],
+        },
+        tokenizationSpecification: {
+          type: "PAYMENT_GATEWAY",
+          parameters: {
+            gateway: "example",
+          },
+        },
+      },
+    ],
+    merchantInfo: {
+      merchantId: "12345678901234567890",
+      merchantName: "Demo Merchant",
+    },
+    transactionInfo: {
+      totalPriceStatus: "FINAL",
+      totalPriceLabel: "Total",
+      totalPrice: "100.00",
+      currencyCode: "USD",
+      countryCode: "US",
+    },
+  };
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     const email = user.email;
@@ -78,24 +121,72 @@ function Checkout() {
         if (res.data.err === 0) {
           localStorage.removeItem("selectedaddr");
 
-          alert("Order Placed Successfully");
+          // alert("Order Placed Successfully");
+          setAlertmsg("Order Placed Successfully");
+          setOpen2(true);
           delCart(user.email);
           localStorage.removeItem("cart");
           dispatch({ type: "count", payload: 0 });
-
-          navigate("/products");
+          setTimeout(() => {
+            navigate("/products");
+          }, 2000);
         } else {
-          alert("Something Went Wrong");
+          // alert("Something Went Wrong");
+          setAlertmsg("Something Went Wrong");
+          setOpen(true);
         }
       });
     } else {
-      alert("Please Select a Address");
+      // alert("Please Select a Address");
+      setAlertmsg("Please Select a Address");
+      setOpen(true);
     }
+  };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false)
+    setOpen(false);
   };
   return (
     <div>
       <div className="mt-2">
         <Container>
+          <Snackbar
+            open={open}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+          >
+            <Alert
+              onClose={handleClose}
+              severity="error"
+              sx={{ width: "100%", height: "100%" }}
+            >
+              {alertmsg}
+            </Alert>
+          </Snackbar>
+          <Snackbar
+            open={open2}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "center",
+            }}
+          >
+            <Alert
+              onClose={handleClose}
+              severity="success"
+              sx={{ width: "100%", height: "100%" }}
+            >
+              {alertmsg}
+            </Alert>
+          </Snackbar>
           <h2 className="text-start fontapply">Checkout</h2>
           <hr />
           <Row className="mt-3">
@@ -148,6 +239,17 @@ function Checkout() {
                   {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
 
                   <div className="d-grid gap-2 mt-5">
+                    <GooglePayButton
+                      environment="TEST"
+                      buttonColor={buttonColor}
+                      buttonType={buttonType}
+                      buttonSizeMode={buttonSizeMode}
+                      paymentRequest={paymentRequest}
+                      onLoadPaymentData={(paymentRequest) => {
+                        console.log("load payment data", paymentRequest);
+                      }}
+                      style={{ width: buttonWidth, height: buttonHeight }}
+                    />
                     <Button
                       variant="primary"
                       size="lg"

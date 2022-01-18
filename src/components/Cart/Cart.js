@@ -4,7 +4,8 @@ import { addCart } from "../../config/Myservice";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import HashLoader from "react-spinners/HashLoader";
-
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "./Cart.css";
 function Cart() {
   const [cartitems, setCartitems] = useState([]);
@@ -13,6 +14,12 @@ function Cart() {
   const [total, settotal] = useState();
   const [email, setemail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const override = `
   display: block;
   margin: 230px auto;
@@ -78,19 +85,24 @@ function Cart() {
   const delCartitem = (index) => {
     // console.log(id);
     let array = JSON.parse(localStorage.getItem("cart"));
-
-    array.splice(index, 1);
-    localStorage.setItem("cart", JSON.stringify(array));
+    let arr = array;
+    arr.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(arr));
     callfunction();
   };
   const quantHandler = (e, cart, i) => {
-    // const quantity = e.target.value;
     let uparray = JSON.parse(localStorage.getItem("cart"));
-    // uparray[i]=cart.quantity
-    let obj = cart;
-    obj.quantity = e.target.value;
-    uparray[i] = obj;
+    // let cart=uparray
+    uparray[i].quantity = e.target.value;
+    console.log(uparray);
+    // setCart(updatedCart)
     localStorage.setItem("cart", JSON.stringify(uparray));
+    let arr = JSON.parse(localStorage.getItem("cart"));
+    setCartitems(arr);
+    // let obj = cart;
+    // obj.quantity = e.target.value;
+    // uparray[i] = obj;
+    // localStorage.setItem("cart", JSON.stringify(uparray));
     callfunction();
 
     // if (quantity < 1) {
@@ -107,7 +119,7 @@ function Cart() {
 
   const buyHandler = () => {
     if (JSON.parse(localStorage.getItem("user"))) {
-      if (cartitems) {
+      if (JSON.parse(localStorage.getItem("cart")).length>0) {
         let order = {
           cartitems: cartitems,
           subtotal: subtotal,
@@ -120,13 +132,31 @@ function Cart() {
 
         navigate("/checkout");
       } else {
-        alert("Nothing in Cart Please add Products in Cart");
-        navigate("/products");
+        // alert("Nothing in Cart Please add Products in Cart");
+        setAlertmsg("Nothing in Cart Please add Products")
+        setOpen(true);
+  
+        setTimeout(()=> {
+          navigate("/products");
+        }, 2000);
       }
     } else {
-      alert("Login is Required");
-      navigate("/login");
+      // alert("Login is Required");
+      setAlertmsg("Login is Required")
+      setOpen(true);
+
+      setTimeout(()=> {
+        navigate("/login");
+      }, 2000);
     }
+  };
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
   };
   return (
     <div>
@@ -140,6 +170,18 @@ function Cart() {
       ) : (
         <div className="mt-2">
           <Container>
+            <Snackbar open={open} autoHideDuration={3000} onClose={handleClose} anchorOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}>
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%" }}
+              >
+                {alertmsg}
+              </Alert>
+            </Snackbar>
             <h2 className="text-start fontapply">Cart</h2>
             <hr />
             <Row className="mt-3">

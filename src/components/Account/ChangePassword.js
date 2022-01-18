@@ -13,6 +13,8 @@ import {
   InputGroup,
   FormControl,
 } from "react-bootstrap";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "./ChangePassword.css";
 import { useNavigate } from "react-router-dom";
 // import bcryptjs from 'bcryptjs';
@@ -38,7 +40,13 @@ function ChangePassword() {
   const [userdata, setuserdata] = useState();
   const [genOTP, setgenOTP] = useState();
   const [otpsent, setotpsent] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
 
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   useEffect(() => {
     const userdata = JSON.parse(localStorage.getItem("user"));
     setuserdata(userdata);
@@ -110,11 +118,15 @@ function ChangePassword() {
       changePassword({ email, password, oldpassword }).then((res, err) => {
         console.log(err);
         if (res.data.success) {
-          alert(res.data.message);
+          // alert(res.data.message);
+          setAlertmsg(res.data.message);
+          setOpen(true);
           localStorage.removeItem("login");
           localStorage.removeItem("user");
           localStorage.removeItem("_token");
-          navigate("/login");
+          setTimeout(() => {
+            navigate("/login");
+          }, 1500);
         } else {
           alert(res.data.message);
         }
@@ -132,7 +144,9 @@ function ChangePassword() {
 
       document.getElementById("myForm").reset();
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen2(true);
     }
   };
   const validate = (errors) => {
@@ -150,10 +164,51 @@ function ChangePassword() {
     });
     setotpsent(true);
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false);
+    setOpen(false);
+  };
 
   return (
     <div>
       <Container className=" mt-3 ">
+        <Snackbar
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={open2}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="error"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
         <div className="formadjustcpass">
           <h1 className="fontapply">Change Password</h1>
           <br />

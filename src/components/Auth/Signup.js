@@ -15,6 +15,8 @@ import HashLoader from "react-spinners/HashLoader";
 import "./Signup.css";
 import { useNavigate } from "react-router-dom";
 import SocialButton from "./SocialButton";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 // import bcryptjs from 'bcryptjs';
 const regForEmail = RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 const regForName = /^[a-zA-Z ]{2,100}$/;
@@ -30,7 +32,14 @@ const regForMobile = RegExp(
 function Signup() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [alertmsg, setAlertmsg] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
 
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const [user, setUser] = useState({
     fname: "",
     lname: "",
@@ -119,7 +128,13 @@ function Signup() {
 
     // setErrors(errors)
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
 
+    setOpen(false);
+  };
   const formSubmit = async (event) => {
     event.preventDefault();
     // setUser({ ...user, cource: selectedc });
@@ -139,20 +154,38 @@ function Signup() {
 
       addSignup(user).then((res) => {
         if (res.data.err === 0) {
-          alert("Registered Succesfully");
-          navigate("/login");
+          // alert("Registered Succesfully");
+          setAlertmsg("Registered Succesfully")
+          setOpen2(true);
+    
+          setTimeout(()=> {
+            navigate("/login");
+          }, 2000);
         } else if (res.data.err === 2) {
-          alert("User Already Exist. Please Login");
-          navigate("/login");
+          // alert("User Already Exist. Please Login");
+          setAlertmsg("User Already Exist. Please Login")
+          setOpen(true);
+    
+          setTimeout(()=> {
+            navigate("/login");
+          }, 2000);
         } else if (res.data.err === 3) {
-          alert("You are Already Registered with Social Login");
-          navigate("/login");
+          // alert("You are Already Registered with Social Login");
+          setAlertmsg("You are Already Registered with Social Login")
+          setOpen(true);
+    
+          setTimeout(()=> {
+            navigate("/login");
+          }, 2000);
+          
         }
       });
 
       document.getElementById("myForm").reset();
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen(true);
     }
   };
   const validate = (errors) => {
@@ -198,6 +231,40 @@ function Signup() {
           />
         ) : (
           <Container className="mt-3">
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%", height: "100%" }}
+              >
+                {alertmsg}
+              </Alert>
+            </Snackbar>
+            <Snackbar
+              open={open2}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="success"
+                sx={{ width: "100%", height: "100%" }}
+              >
+                {alertmsg}
+              </Alert>
+            </Snackbar>
             <Form id="myForm " className="formadjustsignup">
               <h1 className="fontapply">Register to NeoSTORE</h1>
               <br />

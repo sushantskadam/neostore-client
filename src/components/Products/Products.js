@@ -13,6 +13,10 @@ import StarRatings from "react-star-ratings";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import HashLoader from "react-spinners/HashLoader";
+import Stack from "@mui/material/Stack";
+// import Button from '@mui/material/Button';
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 function Products({ search }) {
   // console.log(search);
@@ -25,6 +29,8 @@ function Products({ search }) {
   const [pageNumber, setPageNumber] = useState(0);
   const [alertmsg, setAlertmsg] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+
   const override = `
   display: block;
   margin: 230px auto;
@@ -32,7 +38,9 @@ function Products({ search }) {
 `;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const userPerPage = 6;
   const pagesVisited = pageNumber * userPerPage;
 
@@ -58,7 +66,7 @@ function Products({ search }) {
           <Card.Img
             variant="top"
             src={prod.product_subImages[0]}
-            className="mt-1 bg-gradient"
+            className="mt-1 bg-gradient rounded"
             width="200"
             height="250"
           />
@@ -96,7 +104,6 @@ function Products({ search }) {
     setPageNumber(selected);
   };
   useEffect(() => {
-
     getProducts().then((res, err) => {
       setProductData(res.data.data);
       setProdata(res.data.data.slice(0, 30));
@@ -116,15 +123,13 @@ function Products({ search }) {
         // console.log(res.data.data);
       }
     });
-    
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
     }, 1000);
     if (JSON.parse(localStorage.getItem("user"))) {
-
       countcalc();
-     
     }
 
     let cart = JSON.parse(localStorage.getItem("cart"));
@@ -134,8 +139,8 @@ function Products({ search }) {
       addCart({ cart, email });
     }
   }, []);
-  
-  const countcalc=()=>{
+
+  const countcalc = () => {
     let array = JSON.parse(localStorage.getItem("cart"));
     if (array) {
       const count = array
@@ -147,7 +152,7 @@ function Products({ search }) {
     } else {
       dispatch({ type: "count", payload: 0 });
     }
-  }
+  };
   const categoryHandler = (catname) => {
     setCategoryselected(catname);
     if (colorselected === "") {
@@ -244,6 +249,8 @@ function Products({ search }) {
       if (found === true) {
         // alert("Product Quantity Increased");
         setAlertmsg("Product Quantity Increased");
+        setOpen(true);
+
         const index = array.findIndex((x) => x.id === prod._id);
         let newarray = array;
         let updata = {
@@ -268,6 +275,7 @@ function Products({ search }) {
 
         // alert("Product added to Cart");
         setAlertmsg("Product added to Cart");
+        setOpen(true);
       }
     } else {
       let array = [];
@@ -277,10 +285,19 @@ function Products({ search }) {
       localStorage.setItem("cart", JSON.stringify(array));
       // alert("Product added to Cart");
       setAlertmsg("Product added to Cart");
+      setOpen(true);
     }
 
-    countcalc()
+    countcalc();
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
+
   return (
     <div>
       {loading ? (
@@ -293,10 +310,28 @@ function Products({ search }) {
       ) : (
         <>
           <Container>
-            {alertmsg && (
+            {/* {alertmsg && (
               <Alert variant="info mt-2 fontapply fs-5">{alertmsg}</Alert>
-            )}
+            )} */}
+            <Snackbar
+              open={open}
+              autoHideDuration={1000}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="success"
+                sx={{ width: "100%" }}
+              >
+                {alertmsg}
+              </Alert>
+            </Snackbar>
           </Container>
+
           <div className="sidebar floatleft">
             <a>
               <div className="dropdown">
@@ -327,7 +362,7 @@ function Products({ search }) {
                 </div>
               </div>
             </div>
-            <br/>
+            <br />
             <div>
               <div className="dropdown">
                 <button className="dropbtn">

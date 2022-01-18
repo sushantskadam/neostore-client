@@ -6,6 +6,8 @@ import { addCart, getProducts, getCategory } from "../../config/Myservice";
 import StarRatings from "react-star-ratings";
 import { useNavigate } from "react-router-dom";
 import HashLoader from "react-spinners/HashLoader";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "./Dashboard.css";
 
 function Dashboard() {
@@ -17,7 +19,10 @@ function Dashboard() {
   const [category, setCategory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [alertmsg, setAlertmsg] = useState(false);
-
+  const [open, setOpen] = useState(false);
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const override = `
   display: block;
   margin: 230px auto;
@@ -100,6 +105,7 @@ function Dashboard() {
       if (found == true) {
         // alert("Product Quantity Increased");
         setAlertmsg("Product Quantity Increased");
+        setOpen(true)
         const index = array.findIndex((x) => x.id === prod._id);
         let newarray = array;
         let updata = {
@@ -124,6 +130,7 @@ function Dashboard() {
 
         // alert("Product added to Cart");
         setAlertmsg("Product added to Cart");
+        setOpen(true)
       }
     } else {
       let array = [];
@@ -133,11 +140,20 @@ function Dashboard() {
       localStorage.setItem("cart", JSON.stringify(array));
       // alert("Product added to Cart");
       setAlertmsg("Product added to Cart");
+      setOpen(true)
     }
 
     countcalc()
 
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    
+    setOpen(false);
+  };
+
   return (
     <div>
       {loading ? (
@@ -176,7 +192,23 @@ function Dashboard() {
               </Carousel.Item>
             ))}
           </Carousel>
-
+          <Snackbar
+                open={open}
+                autoHideDuration={1000}
+                onClose={handleClose}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "center",
+                }}
+              >
+                <Alert
+                  onClose={handleClose}
+                  severity="success"
+                  sx={{ width: "100%", height: "100%" }}
+                >
+                  {alertmsg}
+                </Alert>
+              </Snackbar>
           <h4 className="mt-4 fontapply">Popular Products</h4>
           <a
             style={{ cursor: "pointer" }}
@@ -184,11 +216,11 @@ function Dashboard() {
           >
             View All
           </a>
-          <Container>
+          {/* <Container>
             {alertmsg && (
               <Alert variant="info mt-2 fontapply fs-5">{alertmsg}</Alert>
             )}
-          </Container>
+          </Container> */}
 
           <Row xs={6} md={4} className="justify-content-center fontapply">
             {prodata.map((prod, i) => (

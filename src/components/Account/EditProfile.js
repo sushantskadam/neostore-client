@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Row, Col, Container, Form } from "react-bootstrap";
 import { getUser, updateUser } from "../../config/Myservice";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 import "./EditProfile.css";
 const regForEmail = RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 const regForName = /^[a-zA-Z ]{2,100}$/;
@@ -18,6 +20,13 @@ function EditProfile() {
   const refemail = useRef(null);
   const refdob = useRef(null);
   const refpimg = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const [errors, setErrors] = useState({
     fname: "",
     lname: "",
@@ -59,10 +68,14 @@ function EditProfile() {
 
     updateUser(data).then((res) => {
       if (res.data.err === 0) {
-        alert("Updated Successully");
+        // alert("Updated Successully");
+        setAlertmsg("Updated Successully");
+        setOpen(true);
         setedit(true);
       } else {
-        alert("Something Went Wrong");
+        // alert("Something Went Wrong");
+        setAlertmsg("Something Went Wrong");
+        setOpen2(true);
       }
     });
 
@@ -100,15 +113,56 @@ function EditProfile() {
 
     // setErrors(errors)
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false);
+    setOpen(false);
+  };
 
   return (
     <div className="card  text-start  editprofile">
+      <Snackbar
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="success"
+          sx={{ width: "100%", height: "100%" }}
+        >
+          {alertmsg}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={open2}
+        autoHideDuration={3000}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "top",
+          horizontal: "center",
+        }}
+      >
+        <Alert
+          onClose={handleClose}
+          severity="error"
+          sx={{ width: "100%", height: "100%" }}
+        >
+          {alertmsg}
+        </Alert>
+      </Snackbar>
       <div className="card-header">
         <h2 className="fontapply">Profile</h2>
       </div>
       <div className="card-body">
         <Form>
-          <Form.Group as={Row} className="mb-3" >
+          <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="3">
               <b>FirstName</b>
             </Form.Label>
@@ -126,7 +180,7 @@ function EditProfile() {
               )}
             </Col>
           </Form.Group>
-          <Form.Group as={Row} className="mb-3" >
+          <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="3">
               <b>LastName</b>
             </Form.Label>
@@ -144,7 +198,7 @@ function EditProfile() {
               )}
             </Col>
           </Form.Group>
-          <Form.Group as={Row} className="mb-3" >
+          <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="3">
               <b>Gender</b>
             </Form.Label>
@@ -157,14 +211,14 @@ function EditProfile() {
                 name="gender"
                 onChange={handler}
               />
-              
+
               {errors.gender && (
                 <Form.Text style={{ color: "red" }}>{errors.gender}</Form.Text>
               )}
             </Col>
           </Form.Group>
 
-          <Form.Group as={Row} className="mb-3" >
+          <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="3">
               <b>Mobile No</b>
             </Form.Label>
@@ -201,7 +255,7 @@ function EditProfile() {
             </Col>
           </Form.Group>
 
-          <Form.Group as={Row} className="mb-3" >
+          <Form.Group as={Row} className="mb-3">
             <Form.Label column sm="3">
               <b>Date Of Birth</b>
             </Form.Label>
@@ -210,7 +264,6 @@ function EditProfile() {
                 type="date"
                 name="dob"
                 id="dob"
-                
                 ref={refdob}
                 disabled={edit}
                 defaultValue={userdb.dob}

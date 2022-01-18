@@ -12,7 +12,8 @@ import EditAddress from "./EditAddress";
 import Orders from "./Orders";
 import HashLoader from "react-spinners/HashLoader";
 import { useDispatch, useSelector } from "react-redux";
-
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 const regForEmail = RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 
 const regForPassword = RegExp(
@@ -30,15 +31,19 @@ function Profile() {
   const [addressshow, setAddressshow] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
 
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const override = `
   display: block;
   margin: 230px auto;
   border-color: red;
 `;
   useEffect(() => {
-    
-   
     const user = JSON.parse(localStorage.getItem("user"));
     const email = user.email;
 
@@ -52,7 +57,7 @@ function Profile() {
         }, 1000);
       }
     });
-    countcalc()
+    countcalc();
   }, []);
   const imgupHandler = () => {
     let formData = new FormData(); //formdata object
@@ -77,7 +82,7 @@ function Profile() {
         Authentication: `Bearer ${localStorage.getItem("_token")}`,
       },
     };
-console.log(formData)
+    console.log(formData);
     // let data = {
     //   fname: reffname.current.value,
     //   lname: reflname.current.value,
@@ -90,7 +95,9 @@ console.log(formData)
 
     updateImg(formData, config).then((res) => {
       if (res.data.err === 0) {
-        alert("Updated Successully");
+        // alert("Updated Successully");
+        setAlertmsg("Updated Successully");
+        setOpen(true);
         getUser(email).then((res) => {
           if (res.data.err == 0) {
             setUser(res.data.data);
@@ -98,7 +105,9 @@ console.log(formData)
         });
         // setEdit(true)
       } else {
-        alert("Something Went Wrong");
+        // alert("Something Went Wrong");
+        setAlertmsg("Something Went Wrong");
+        setOpen2(true);
       }
     });
     setEdit(false);
@@ -119,17 +128,25 @@ console.log(formData)
     setRightComp(<Orders />);
     setAddressshow(false);
   };
-  const countcalc=()=>{
+  const countcalc = () => {
     let array = JSON.parse(localStorage.getItem("cart"));
-      if (array) {
-        const count = array
-          .map((item) => Number(item.quantity))
-          .reduce((prev, curr) => prev + curr, 0);
-        // console.log("count"+count)
-        dispatch({ type: "count", payload: count });
-        console.log(count);
-      }
-  }
+    if (array) {
+      const count = array
+        .map((item) => Number(item.quantity))
+        .reduce((prev, curr) => prev + curr, 0);
+      // console.log("count"+count)
+      dispatch({ type: "count", payload: count });
+      console.log(count);
+    }
+  };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false)
+    setOpen(false);
+  };
+
   if (user) {
     return (
       <div className="mt-1">
@@ -142,132 +159,169 @@ console.log(formData)
           />
         ) : (
           <Container>
-          <h2 className="text-start fontapply">My Account</h2>
-          <hr />
-          <Row className="mt-2">
-            <Col lg={4}>
-              <div className="card text-center pb-3 pt-3">
-                {/* <div className="card-header">Profile</div> */}
-                <div className="card-body">
-                  {user.pimg ? (
-                    <img
-                      // src={`http://localhost:9999/${user.pimg}`}
-                      src={
-                        !user.soclogin
-                          ? `http://localhost:9999/${user.pimg}`
-                          : `${user.pimg}`
-                      }
-                      width={120}
-                      height={110}
-                      className="rounded-circle"
-                      alt="Profile Img"
-                    />
-                  ) : (
-                    <img
-                      src="https://www.kindpng.com/picc/m/24-248253_user-profile-default-image-png-clipart-png-download.png"
-                      width={120}
-                      height={110}
-                      className="rounded-circle"
-                      alt="Profile Img"
-                    />
-                  )}
-                  <br />
-                  <br />
-                  {edit ? (
-                    <div>
-                      <Form.Group as={Row} className="mb-3">
-                        <Form.Label>
-                          <b>Profile Picture</b>
-                        </Form.Label>
-                        <Col>
-                          <Form.Control
-                            type="file"
-                            size="sm"
-                            //  ref={refpimg}
-                            className="w-75 ml-5"
-                          />
-                        </Col>
-                      </Form.Group>
+            <Snackbar
+              open={open}
+              autoHideDuration={3000}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="success"
+                sx={{ width: "100%", height: "100%" }}
+              >
+                {alertmsg}
+              </Alert>
+            </Snackbar>
+            <Snackbar
+              open={open2}
+              autoHideDuration={3000}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%", height: "100%" }}
+              >
+                {alertmsg}
+              </Alert>
+            </Snackbar>
+            <h2 className="text-start fontapply">My Account</h2>
+            <hr />
+            <Row className="mt-2">
+              <Col lg={4}>
+                <div className="card text-center pb-3 pt-3">
+                  {/* <div className="card-header">Profile</div> */}
+                  <div className="card-body">
+                    {user.pimg ? (
+                      <img
+                        // src={`http://localhost:9999/${user.pimg}`}
+                        src={
+                          !user.soclogin
+                            ? `http://localhost:9999/${user.pimg}`
+                            : `${user.pimg}`
+                        }
+                        width={120}
+                        height={110}
+                        className="rounded-circle"
+                        alt="Profile Img"
+                      />
+                    ) : (
+                      <img
+                        src="https://www.kindpng.com/picc/m/24-248253_user-profile-default-image-png-clipart-png-download.png"
+                        width={120}
+                        height={110}
+                        className="rounded-circle"
+                        alt="Profile Img"
+                      />
+                    )}
+                    <br />
+                    <br />
+                    {edit ? (
+                      <div>
+                        <Form.Group as={Row} className="mb-3">
+                          <Form.Label>
+                            <b>Profile Picture</b>
+                          </Form.Label>
+                          <Col>
+                            <Form.Control
+                              type="file"
+                              size="sm"
+                              //  ref={refpimg}
+                              className="w-75 ml-5"
+                            />
+                          </Col>
+                        </Form.Group>
+                        <Button
+                          variant="outline-dark"
+                          size="sm"
+                          onClick={() => imgupHandler()}
+                        >
+                          Update Profile Picture
+                        </Button>
+                        <br />
+                      </div>
+                    ) : (
                       <Button
                         variant="outline-dark"
-                        size="sm"
-                        onClick={() => imgupHandler()}
+                        onClick={() => setEdit(true)}
+                        style={{ fontSize: "15px" }}
                       >
-                        Update Profile Picture
+                        {" "}
+                        <i className="fa fa-edit"></i>
                       </Button>
-                      <br />
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline-dark"
-                      onClick={() => setEdit(true)}
-                      style={{ fontSize: "15px" }}
-                    >
-                      {" "}
-                      <i className="fa fa-edit"></i>
-                    </Button>
-                  )}
-                  <br />
-                  <h3 className="card-title mt-2">
-                    {user.fname} {user.lname}
-                  </h3>
-                  <p className="card-text"></p>
-                  {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
-                  <Button
-                    variant="outline-danger"
-                    className="profilebttn"
-                    onClick={() => ordersClicked()}
-                  >
-                    <i className="fa fa-bars" aria-hidden="true"></i> Orders
-                  </Button>{" "}
-                  <br />
-                  <Button
-                    variant="outline-danger"
-                    className="profilebttn"
-                    onClick={() => profileClicked()}
-                  >
-                    <i className="fa fa-user-circle" aria-hidden="true"></i>{" "}
-                    Profile
-                  </Button>{" "}
-                  <br />
-                  <Button
-                    variant="outline-danger"
-                    className="profilebttn"
-                    onClick={() => addressClick()}
-                  >
-                    <i className="fa fa-address-book-o" aria-hidden="true"></i>{" "}
-                    Address
-                  </Button>{" "}
-                  <br />
-                  {addressshow && (
+                    )}
+                    <br />
+                    <h3 className="card-title mt-2">
+                      {user.fname} {user.lname}
+                    </h3>
+                    <p className="card-text"></p>
+                    {/* <a href="#" className="btn btn-primary">Go somewhere</a> */}
                     <Button
                       variant="outline-danger"
                       className="profilebttn"
-                      onClick={() => setRightComp(<AddAddress />)}
+                      onClick={() => ordersClicked()}
                     >
-                      <i className="fa fa-plus" aria-hidden="true"></i> Add New
+                      <i className="fa fa-bars" aria-hidden="true"></i> Orders
+                    </Button>{" "}
+                    <br />
+                    <Button
+                      variant="outline-danger"
+                      className="profilebttn"
+                      onClick={() => profileClicked()}
+                    >
+                      <i className="fa fa-user-circle" aria-hidden="true"></i>{" "}
+                      Profile
+                    </Button>{" "}
+                    <br />
+                    <Button
+                      variant="outline-danger"
+                      className="profilebttn"
+                      onClick={() => addressClick()}
+                    >
+                      <i
+                        className="fa fa-address-book-o"
+                        aria-hidden="true"
+                      ></i>{" "}
                       Address
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline-danger"
-                    className="profilebttn"
-                    onClick={() => changepassClicked()}
-                  >
-                    <i className="fa fa-key"></i> Change Password
-                  </Button>{" "}
-                  <br />
+                    </Button>{" "}
+                    <br />
+                    {addressshow && (
+                      <Button
+                        variant="outline-danger"
+                        className="profilebttn"
+                        onClick={() => setRightComp(<AddAddress />)}
+                      >
+                        <i className="fa fa-plus" aria-hidden="true"></i> Add
+                        New Address
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline-danger"
+                      className="profilebttn"
+                      onClick={() => changepassClicked()}
+                    >
+                      <i className="fa fa-key"></i> Change Password
+                    </Button>{" "}
+                    <br />
+                  </div>
+                  {/* <div className="card-footer text-muted">2 days ago</div> */}
                 </div>
-                {/* <div className="card-footer text-muted">2 days ago</div> */}
-              </div>
-            </Col>
-            <Col lg={8} lg={{ offset: 1 }}>
-              {rightComp}
-            </Col>
-          </Row>
-        </Container>
+              </Col>
+              <Col lg={8} lg={{ offset: 1 }}>
+                {rightComp}
+              </Col>
+            </Row>
+          </Container>
         )}
-        
+
         <br />
       </div>
     );

@@ -1,14 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, Row, Col, Container, Form } from "react-bootstrap";
-import { updateAddr,getCustAddress } from "../../config/Myservice";
+import { updateAddr, getCustAddress } from "../../config/Myservice";
 import { useNavigate } from "react-router-dom";
 import "./EditProfile.css";
 import Address from "./Address";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 const regForName = /^[a-zA-Z ]{2,100}$/;
 
 // import Address from "./Address";
-function EditAddress({ setShowedit, showedit, addr, index,setAlladdr }) {
+function EditAddress({ setShowedit, showedit, addr, index, setAlladdr }) {
   const navigate = useNavigate();
 
   const [edit, setedit] = useState(true);
@@ -26,6 +28,13 @@ function EditAddress({ setShowedit, showedit, addr, index,setAlladdr }) {
     city: "",
     state: "",
     country: "",
+  });
+  const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
   });
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -70,15 +79,23 @@ function EditAddress({ setShowedit, showedit, addr, index,setAlladdr }) {
               // console.log(res.data.data);
             }
           });
-          alert("Address Updated Successfully");
-          setShowedit(false);
+          // alert("Address Updated Successfully");
+          setAlertmsg("Address Updated Successfully");
+          setOpen(true);
+          setTimeout(() => {
+            setShowedit(false);
+          }, 1000);
           document.getElementById("editform").reset();
         } else {
-          alert("Something Went Wrong");
+          // alert("Something Went Wrong");
+          setAlertmsg("Something Went Wrong");
+          setOpen2(true);
         }
       });
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen2(true);
     }
   };
   const handler = (event) => {
@@ -118,18 +135,56 @@ function EditAddress({ setShowedit, showedit, addr, index,setAlladdr }) {
     Object.values(errors).forEach((val) => val.length > 0 && (valid = false));
     return valid;
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setOpen2(false);
+    setOpen(false);
+  };
   if (showedit) {
     return (
       <div className="card  text-start  editprofile">
+        <Snackbar
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
+        <Snackbar
+          open={open2}
+          autoHideDuration={3000}
+          onClose={handleClose}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "center",
+          }}
+        >
+          <Alert
+            onClose={handleClose}
+            severity="error"
+            sx={{ width: "100%", height: "100%" }}
+          >
+            {alertmsg}
+          </Alert>
+        </Snackbar>
         <div className="card-header">
           <h2 className="fontapply">Update Address</h2>
         </div>
         <div className="card-body mt-2">
           <Form id="editform">
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={7}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control
@@ -151,10 +206,7 @@ function EditAddress({ setShowedit, showedit, addr, index,setAlladdr }) {
                 )}
               </Col>
             </Form.Group>
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={6}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control
@@ -174,10 +226,7 @@ function EditAddress({ setShowedit, showedit, addr, index,setAlladdr }) {
                 )}
               </Col>
             </Form.Group>
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={5}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control
@@ -212,10 +261,7 @@ function EditAddress({ setShowedit, showedit, addr, index,setAlladdr }) {
                 )}
               </Col>
             </Form.Group>
-            <Form.Group
-              as={Row}
-              className="mb-4"
-            >
+            <Form.Group as={Row} className="mb-4">
               <Col sm={6}>
                 {/* <Form.Label for="inputAddress">Address</Form.Label> */}
                 <Form.Control

@@ -7,7 +7,7 @@
   margin: 0;
   padding: 0;
   width: 200px;
-  background-color: #ffffff;
+  /* background-color: #ffffff; */
   position: left;
   height: 525px;
   overflow: auto;
@@ -63,7 +63,15 @@ div.content {
 }
 .cardcss {
   box-shadow: 0px 8px 16px 0px rgba(255, 2, 2, 0.192);
+  border-radius: 45px;
 }
+body {
+  background-image: url("https://hougumlaw.com/wp-content/uploads/2016/05/light-website-backgrounds-light-color-background-images-light-color-background-images-for-website-1024x640.jpg");
+  background-color: #cccccc;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+ }
 /* On screens that are less than 700px wide, make the sidebar into a topbar */
 @media screen and (max-width: 700px) {
   

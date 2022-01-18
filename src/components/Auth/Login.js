@@ -15,7 +15,8 @@ import {
   InputGroup,
   FormControl,
 } from "react-bootstrap";
-
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 const regForEmail = RegExp(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
 
 const regForPassword = RegExp(
@@ -38,6 +39,12 @@ function Login() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [alertmsg, setAlertmsg] = useState(false);
+
+  const Alert = React.forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+  });
   const override = `
   display: block;
   margin: 230px auto;
@@ -181,11 +188,17 @@ function Login() {
           localStorage.setItem("login", JSON.stringify(login));
           navigate("/");
         } else if (res.data.err === 1) {
-          alert(res.data.msg);
+          // alert(res.data.msg);
+          setAlertmsg(res.data.msg);
+          setOpen(true);
         } else if (res.data.err === 2) {
-          alert(res.data.msg);
+          // alert(res.data.msg);
+          setAlertmsg(res.data.msg);
+          setOpen(true);
         } else if (res.data.err === 3) {
-          alert("You Are Registered with Social Login");
+          // alert("You Are Already Registered with Social Login");
+          setAlertmsg("You Are Already Registered with Social Login");
+          setOpen(true);
         }
       });
       // userdata.map((data, i) => {
@@ -210,7 +223,9 @@ function Login() {
       //   alert("Username/Email or Password is wrong");
       // }
     } else {
-      alert("Please Enter Valid Data");
+      // alert("Please Enter Valid Data");
+      setAlertmsg("Please Enter Valid Data");
+      setOpen(true);
     }
   };
   const validate = (errors) => {
@@ -266,6 +281,13 @@ function Login() {
       });
     }
   };
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
 
   const handleSocialLoginFailure = (err) => {
     console.error(err);
@@ -285,6 +307,23 @@ function Login() {
           />
         ) : (
           <Container>
+            <Snackbar
+              open={open}
+              autoHideDuration={6000}
+              onClose={handleClose}
+              anchorOrigin={{
+                vertical: "top",
+                horizontal: "center",
+              }}
+            >
+              <Alert
+                onClose={handleClose}
+                severity="error"
+                sx={{ width: "100%", height: "100%" }}
+              >
+                {alertmsg}
+              </Alert>
+            </Snackbar>
             <Row>
               <Col xl={5}>
                 {" "}
