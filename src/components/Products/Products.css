@@ -51,10 +51,14 @@ div.content {
   opacity: 1;
   transform: scale(1.02);
   cursor: pointer;
+  border-radius: 20px;
+
 }
 .card-hghlght:not(:hover) {
   opacity: 0.9;
   transform: scale(1);
+  border-radius: 20px;
+
 }
 .cardbutton {
   margin-top: auto;
@@ -63,7 +67,12 @@ div.content {
 }
 .cardcss {
   box-shadow: 0px 8px 16px 0px rgba(255, 2, 2, 0.192);
-  border-radius: 45px;
+  border-radius: 20px;
+}
+.cardimgprod{
+  border-radius: 20px ;
+  margin-top: 5px;
+
 }
 
 /* On screens that are less than 700px wide, make the sidebar into a topbar */
@@ -94,15 +103,19 @@ div.content {
     max-width: 100px;
   }
   .sidebar {
-    margin: 0;
+    margin: 2;
     padding: 0;
     width: 160px;
-    background-color: #ffffff;
+    /* background-color: #ffffff; */
     position: left;
     /* display: inline; */
     height: 600px;
     /* overflow: auto; */
     margin-top: 4px;
+    /* float: right; */
+    /* display: block; */
+    /* display: flex; */
+    /* position: relative; */
   }
 }
 

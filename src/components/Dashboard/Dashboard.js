@@ -233,7 +233,7 @@ function Dashboard() {
                   <Card.Img
                     variant="top"
                     src={prod.product_subImages[0]}
-                    className="mt-1 bg-gradient"
+                    className="cardimgprod"
                     width="200"
                     height="250"
                   />

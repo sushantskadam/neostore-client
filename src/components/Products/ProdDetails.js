@@ -209,6 +209,7 @@ function ProdDetails() {
                     />
                     {/* <img data-image="blue" src="images/blue.png" alt=""/>
    <img data-image="red" className="active" src="images/red.png" alt=""/> */}
+   
                   </div>
                   <div>
                     <button
@@ -388,7 +389,7 @@ function ProdDetails() {
                   </div>
                 </Col>
               </Row>
-              <div className="container mt-4">
+              <div className="container mt-4 ">
                 <Tabs
                   defaultActiveKey="profile"
                   id="uncontrolled-tab-example"
@@ -397,7 +398,7 @@ function ProdDetails() {
                   <Tab
                     eventKey="home"
                     title="Description"
-                    className="text-secondary"
+                    className="text-secondary "
                   >
                     {product.product_desc}
                   </Tab>

@@ -66,7 +66,7 @@ function Products({ search }) {
           <Card.Img
             variant="top"
             src={prod.product_subImages[0]}
-            className="mt-1 bg-gradient rounded"
+            className="cardimgprod"
             width="200"
             height="250"
           />
@@ -362,7 +362,7 @@ function Products({ search }) {
                 </div>
               </div>
             </div>
-            <br />
+           <br/>
             <div>
               <div className="dropdown">
                 <button className="dropbtn">

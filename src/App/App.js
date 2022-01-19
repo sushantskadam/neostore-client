@@ -1,20 +1,35 @@
 import logo from "./logo.svg";
 import "./App.css";
+import React from 'react'
 import Footer from "../components/Footer/Footer";
 import Navb from "../components/Navbar/Navb";
 import Login from "../components/Auth/Login";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Signup from "../components/Auth/Signup";
 import Dashboard from "../components/Dashboard/Dashboard";
 import ForgotPassword from "../components/Auth/ForgotPassword";
 import Products from "../components/Products/Products";
 import ChangePassword from "../components/Account/ChangePassword";
-import { useState } from "react";
 import ProdDetails from "../components/Products/ProdDetails";
 import Cart from "../components/Cart/Cart";
 import Profile from "../components/Account/Profile";
 import Checkout from "../components/Checkout/Checkout";
 import SimpleMap from "../components/Footer/SimpleMap";
+import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// const Footer = React.lazy(() => import('../components/Footer/Footer'));
+// const Navb = React.lazy(() => import('../components/Navbar/Navb'));
+// const Login = React.lazy(() => import('../components/Auth/Login'));
+// const Signup = React.lazy(() => import('../components/Auth/Signup'));
+// const Dashboard = React.lazy(() => import('../components/Dashboard/Dashboard'));
+// const ForgotPassword = React.lazy(() => import('../components/Auth/ForgotPassword'));
+// const Products = React.lazy(() => import('../components/Products/Products'));
+// const ProdDetails = React.lazy(() => import('../components/Products/ProdDetails'));
+// const Cart = React.lazy(() => import('../components/Cart/Cart'));
+// const Profile = React.lazy(() => import('../components/Account/Profile'));
+// const Checkout = React.lazy(() => import('../components/Checkout/Checkout'));
+// const SimpleMap = React.lazy(() => import('../components/Footer/SimpleMap'));
+
+
 
 function App() {
   const [search, setSearch] = useState("");

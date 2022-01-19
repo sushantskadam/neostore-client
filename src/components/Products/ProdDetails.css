@@ -14,17 +14,17 @@
 /* Columns */
 
 .left-column {
-  width: 55%;
-  margin-top: 40px;
+  /* width: 55%; */
+  /* margin-top: 40px; */
   position: relative;
   /* margin-left: -50px; */
-  padding-left: 50px;
+  /* padding-left: 50px; */
 }
 
-.right-column {
+/* .right-column {
   width: 45%;
   margin-top: 45px;
-}
+} */
 
 /* Left Column */
 .left-column img {
