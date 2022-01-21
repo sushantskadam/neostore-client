@@ -1,7 +1,7 @@
 .addhovor a:hover:not(.active) {
   background-color: rgb(233, 53, 53);
   color: white;
-  border-radius: 25px;
+  border-radius: 20px;
 }
 /* .fontapplynav{
   font-family: 'Source Sans Pro', sans-serif;
